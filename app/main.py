@@ -4,6 +4,13 @@ from app.config import get_settings
 from app.routers import pantry
 from app.routers import pantry, auth  # <-- Import the new auth router
 from datetime import datetime  # <-- Import datetime
+from app.database import Base, engine # <-- Import Base and engine
+
+
+# --- 2. Create all database tables on startup ---
+# This looks at your app/models/ and creates tables.
+Base.metadata.create_all(bind=engine)
+# ------------------------------------------------
 
 settings = get_settings()
 
@@ -25,7 +32,9 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix="/api")   # <-- 3. Include auth router
 app.include_router(pantry.router, prefix="/api")
+
 
 # Health check
 @app.get("/health")
